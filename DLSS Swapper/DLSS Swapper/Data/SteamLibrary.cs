@@ -43,19 +43,15 @@ namespace DLSS_Swapper.Data
             // Tasks are whack.
             return await Task.Run<List<Game>>(() =>
             {
-                // Base steamapps folder contains libraryfolders.vdf which has references to other steamapps folders.
-                // All of these folders contain appmanifest_[some_id].acf which contains information about the game.
-                // We parse all of these files with jank regex, rather than building a parser.
-                // If we ever need to this page probably contains info on how to do that, https://developer.valvesoftware.com/wiki/KeyValues
 
-                var baseSteamAppsFolder = Path.Combine(installPath, "steamapps");
+            var baseSteamAppsFolder = Path.Combine(installPath, "steamapps");
 
-                var libraryFolders = new List<string>();
-                libraryFolders.Add(baseSteamAppsFolder);
+            var libraryFolders = new List<string>();
+            libraryFolders.Add(baseSteamAppsFolder);
 
-                var libraryFoldersFile = Path.Combine(baseSteamAppsFolder, "libraryfolders.vdf");
-                if (File.Exists(libraryFoldersFile))
-                {
+            var libraryFoldersFile = Path.Combine(baseSteamAppsFolder, "libraryfolders.vdf");
+            if (File.Exists(libraryFoldersFile))
+            {
                     try
                     {
                         StreamReader sr = new StreamReader(libraryFoldersFile);
@@ -66,7 +62,9 @@ namespace DLSS_Swapper.Data
                         {
                             foreach (var library in libraryFile.Children)
                             {
-                                libraryFolders.Add(Path.Combine(library.Properties.FirstOrDefault(x => x.Key == "path").Value, "steamapps"));
+                                string path = Path.Combine(library.Properties.FirstOrDefault(x => x.Key == "path").Value, "steamapps");
+                                if(!libraryFolders.Contains(path))
+                                    libraryFolders.Add(path);
                             }
                         }
                     }
